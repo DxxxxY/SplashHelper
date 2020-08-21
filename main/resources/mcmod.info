@@ -1,0 +1,16 @@
+[
+{
+  "modid": "sh",
+  "name": "Splash Helper",
+  "description": "A mod developed by DxxxxY#5818",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["DxxxxY"],
+  "credits": "DxxxxY#5818",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
