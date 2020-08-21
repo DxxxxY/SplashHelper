@@ -1,11 +1,15 @@
 package cc.dxxxxy.sh;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -23,7 +27,6 @@ import java.net.URL;
 public class SplashHelper {
     private static Configuration config;
     private static Logger logger = LogManager.getLogger(Reference.ID);
-    static String currentVersion;
     static String newVersion;
     public static final KeyBinding openGui = new KeyBinding("Open Gui", Keyboard.KEY_RSHIFT, "Splash Helper");
 
@@ -32,34 +35,48 @@ public class SplashHelper {
         File configFile = new File(Loader.instance().getConfigDir(), "sh.cfg");
         config = new Configuration(configFile);
         config.load();
-        Property isOn = config.get("shs", "Enabled", false);
-        Property fee = config.get("shs", "Fee Amount", 0);
-        Property joinMsg = config.get("shs", "Join Message", "");
-        Property showInHub = config.get("shs", "Show Members in Hub", false);
+        config.get("shs", "Enabled", false);
+        config.get("shs", "Fee Amount", 0);
+        config.get("shs", "Join Message", "");
+        config.get("shs", "Show Members in Hub", false);
+        config.get("shs", "Show Party Size", false);
+        config.get("hidden", "firstJoin", true).set(true);
         if(config.hasChanged()){
             config.save();
         }
+        ClientCommandHandler.instance.registerCommand(new ClearList());
         ClientRegistry.registerKeyBinding(openGui);
-        //ClientCommandHandler.instance.registerCommand(new ReinviteCommand());
+        MinecraftForge.EVENT_BUS.register(new Gui());
         MinecraftForge.EVENT_BUS.register(new Events());
-        //MinecraftForge.EVENT_BUS.register(new ReinviteCommand());
     }
 
-    public void updateChecker() {
+    public static void sendMessage(String msg) {
+        Minecraft.getMinecraft().thePlayer.addChatComponentMessage((IChatComponent) new ChatComponentText(msg));
+    }
+
+    public static void updateChecker() {
         try {
-            HttpURLConnection c = (HttpURLConnection)new URL("https://api.spigotmc.org/legacy/update.php?resource=72777").openConnection();
+            HttpURLConnection c = (HttpURLConnection)new URL("https://raw.githubusercontent.com/DxxxxY/SplashHelper/master/version.txt").openConnection();
             newVersion = new BufferedReader((Reader)new InputStreamReader(c.getInputStream())).readLine();
             c.disconnect();
-            if (newVersion.equals(currentVersion)) {
-                //On latest version
+            if (newVersion.equals(Reference.VERSION)) {
+                sendMessage(ChatFormatting.BOLD+ "[" + ChatFormatting.RESET + ChatFormatting.AQUA + ChatFormatting.BOLD + "SH" + ChatFormatting.RESET + ChatFormatting.BOLD + "]" + ChatFormatting.RESET + ChatFormatting.GREEN + " You are using the latest version of SplashHelper");
             }
             else {
-                //Update available
+                sendMessage(ChatFormatting.BOLD+ "[" + ChatFormatting.RESET + ChatFormatting.AQUA + ChatFormatting.BOLD + "SH" + ChatFormatting.RESET + ChatFormatting.BOLD + "]" + ChatFormatting.RESET + ChatFormatting.RED + " You are using an outdated version of SplashHelper, get the new one here: https://github.com/DxxxxY/SplashHelper/releases");
             }
         }
         catch (IOException ex) {
-            //Error
             ex.printStackTrace();
+        }
+    }
+
+    public static String getBoardTitle(Scoreboard board) {
+        ScoreObjective titleObjective = board.getObjectiveInDisplaySlot(1);
+        if (board.getObjectiveInDisplaySlot(0) != null) {
+            return board.getObjectiveInDisplaySlot(0).getName();
+        } else {
+            return board.getObjectiveInDisplaySlot(1).getName();
         }
     }
 

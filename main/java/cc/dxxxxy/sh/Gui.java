@@ -7,22 +7,24 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Gui extends net.minecraft.client.gui.Gui {
     Configuration config = SplashHelper.getConfig();
 
-    Property isOn = config.get("shs", "Enabled", false);
-    Property fee = config.get("shs", "Fee Amount", 0);
-    Property joinMsg = config.get("shs", "Join Message", "");
     Property showInHub = config.get("shs", "Show Members in Hub", false);
-    FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
+    Property showPartySize = config.get("shs", "Show Party Size", false);
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent e) {
         if (showInHub.getBoolean()) {
             if (e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
-                drawString(fr,"A", 9, 9, Color.cyan.getRGB());
+                drawString(Minecraft.getMinecraft().fontRendererObj, Events.inLobby + " party members in your lobby", 5, 5, Color.cyan.getRGB());
+            }
+        }
+        if (showPartySize.getBoolean()) {
+            if (e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
+                drawString(Minecraft.getMinecraft().fontRendererObj, Integer.toString(Events.members.size()) + " people in your party", 5, 15, Color.cyan.getRGB());
             }
         }
     }
