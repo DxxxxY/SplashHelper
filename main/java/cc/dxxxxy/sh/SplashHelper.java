@@ -73,11 +73,11 @@ public class SplashHelper {
 
     public static String getBoardTitle(Scoreboard board) {
         ScoreObjective titleObjective = board.getObjectiveInDisplaySlot(1);
-        if (board.getObjectiveInDisplaySlot(0) != null) {
-            return board.getObjectiveInDisplaySlot(0).getName();
-        } else {
-            return board.getObjectiveInDisplaySlot(1).getName();
-        }
+        //if (board.getObjectiveInDisplaySlot(0) != null) {
+        //return board.getObjectiveInDisplaySlot(0).getName();
+        //} /*else {
+        return board.getObjectiveInDisplaySlot(1).getName();
+        //}/*/
     }
 
     public static Configuration getConfig() { return config; }

@@ -2,7 +2,6 @@ package cc.dxxxxy.sh;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -11,8 +10,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
@@ -52,21 +49,22 @@ public class Events {
 
     @SubscribeEvent
     public void onChatReceived(ClientChatReceivedEvent e) {
-        String msg = e.message.getFormattedText();
+        String msg = e.message.getUnformattedText();
         if (mc.isSingleplayer()) return;
         if (!mc.getCurrentServerData().serverIP.contains(".hypixel.net")) return;
+        if (msg.contains("   ")) return;
         if (!getBoardTitle(mc.theWorld.getScoreboard()).equals("SBScoreboard")) return;
         if (msg.contains(":")) return;
         if (isOn.getBoolean()) {
             if (msg.contains("Trade completed with")) {
                 if (msg.contains("]")) {
-                    name = msg.substring(msg.indexOf("]") + 2, msg.indexOf("!") - 4);
+                    name = msg.substring(msg.indexOf("]") + 2, msg.indexOf("!"));
                     return;
                 }
-                name = msg.substring(msg.indexOf("h") + 6, msg.indexOf("!") - 4);
+                name = msg.substring(msg.indexOf("h") + 2, msg.indexOf("!"));
             }
             if (msg.contains("+") && msg.contains("coins") && name != null) {
-                int fee = Integer.parseInt(msg.substring(15, msg.indexOf("k")));
+                int fee = Integer.parseInt(msg.substring(3, msg.indexOf("k")));
                 if (fee >= feeK.getInt()) {
                     mc.thePlayer.sendChatMessage("/p " + name);
                     name = null;
@@ -79,20 +77,25 @@ public class Events {
             }
             if (msg.contains("joined the party.")) {
                 if (msg.contains("]")) {
-                        //sendMessage(msg.substring(msg.indexOf("]") + 2, msg.indexOf("joined") - 5));
-                        members.add(msg.substring(msg.indexOf("]") + 2, msg.indexOf("joined the") - 5));
-                        return;
+                    members.add(msg.substring(msg.indexOf("]") + 2, msg.indexOf("joined the") - 1));
+                    return;
                 }
-                //sendMessage(msg.substring(0, msg.indexOf("joined") - 5));
-                members.add(msg.substring(2, msg.indexOf("joined the") - 5));
+                members.add(msg.substring(2, msg.indexOf("joined the") - 1));
             }
             if (msg.contains("left the party.")) {
                 if (msg.contains("You")) return;
                 if (msg.contains("]")) {
-                    members.remove(members.indexOf(msg.substring(msg.indexOf("]") + 2, msg.indexOf("has left") - 5)));
+                    members.remove(members.indexOf(msg.substring(msg.indexOf("]") + 2, msg.indexOf("has left") - 1)));
                     return;
                 }
-                members.remove(members.indexOf(msg.substring(2, msg.indexOf("has left") - 5)));
+                members.remove(members.indexOf(msg.substring(2, msg.indexOf("has left") - 1)));
+            }
+            if (msg.contains("has been removed")) {
+                if (msg.contains("]")) {
+                    members.remove(members.indexOf(msg.substring(msg.indexOf("]") + 2, msg.indexOf("has been removed") - 1)));
+                    return;
+                }
+                members.remove(members.indexOf(msg.substring(2, msg.indexOf("has left") - 1)));
             }
             if (msg.contains("You have joined")) {
                 if (isOn.getBoolean()) {
