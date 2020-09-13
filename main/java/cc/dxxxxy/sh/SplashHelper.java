@@ -35,16 +35,19 @@ public class SplashHelper {
         File configFile = new File(Loader.instance().getConfigDir(), "sh.cfg");
         config = new Configuration(configFile);
         config.load();
-        config.get("shs", "Enabled", false);
-        config.get("shs", "Fee Amount", 0);
+        config.get("shs", "Auto-Party Trade", false);
+        config.get("shs", "Fee Trade", 0);
+        config.get("shs", "Auto-Party Auction", false);
+        config.get("shs", "Fee Auction", 0);
         config.get("shs", "Join Message", "");
-        config.get("shs", "Show Members in Hub", false);
-        config.get("shs", "Show Party Size", false);
+        config.get("shs", "Counters", false);
+        config.get("hidden", "Auction Item", "");
         config.get("hidden", "firstJoin", true).set(true);
         if(config.hasChanged()){
             config.save();
         }
         ClientCommandHandler.instance.registerCommand(new ClearList());
+        ClientCommandHandler.instance.registerCommand(new SetItem());
         ClientRegistry.registerKeyBinding(openGui);
         MinecraftForge.EVENT_BUS.register(new Gui());
         MinecraftForge.EVENT_BUS.register(new Events());
@@ -73,14 +76,12 @@ public class SplashHelper {
 
     public static String getBoardTitle(Scoreboard board) {
         ScoreObjective titleObjective = board.getObjectiveInDisplaySlot(1);
-        //if (board.getObjectiveInDisplaySlot(0) != null) {
-        //return board.getObjectiveInDisplaySlot(0).getName();
-        //} /*else {
+        if (board.getObjectiveInDisplaySlot(0) != null) {
+        return board.getObjectiveInDisplaySlot(0).getName();
+        } else {
         return board.getObjectiveInDisplaySlot(1).getName();
-        //}/*/
+        }
     }
 
     public static Configuration getConfig() { return config; }
-
-    public static Logger getLogger() { return logger; }
 }
